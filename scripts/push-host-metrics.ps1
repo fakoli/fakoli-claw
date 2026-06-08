@@ -1,7 +1,9 @@
 # Runs on fakoli-dark (native Windows PowerShell). Collects GPU + Docker (SGLang/gaming) state
 # with native tools (reliable, unlike WSL interop) and pushes it to the Mac via `wsl rsync`,
 # where collect-metrics.sh / the dashboard consume it. No elevation required.
-# Schedule via Task Scheduler for a live dashboard, or run on demand.
+# Schedule via Task Scheduler for a live dashboard, or run on demand. To avoid a console
+# window flashing every run, the scheduled task launches push-host-metrics.vbs (hidden), which
+# runs this script with window style 0 — NOT powershell.exe directly.
 $ErrorActionPreference = "SilentlyContinue"
 function JNum($v){ if ($v -match '^\d+(\.\d+)?$') { $v } else { "null" } }
 
