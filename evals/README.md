@@ -5,20 +5,31 @@ Focused tooling for measuring and smoke-testing the crew. Run on the gateway hos
 
 ## `eval-harness.sh` — repeatable crew score
 
-Scores a crew agent on deterministic coding micro-tasks (palindrome / fizzbuzz / factorial), each
-with a real verify command, and emits a **repeatable pass-rate + latency per model/config** so model
-or config swaps become decisions, not vibes (Fakoli invariant: *evidence over claim*).
+Scores a crew agent on **6 deterministic coding micro-tasks** (palindrome, fizzbuzz, factorial,
+reverse-words, is-prime, count-vowels), each with a real Python verify, and emits a **repeatable
+pass-rate + latency per model/config** so model or config swaps become decisions, not vibes (Fakoli
+invariant: *evidence over claim*).
 
 ```bash
-FAKOLI_EVAL_AGENT=fakoli-welder bash evals/eval-harness.sh
+bash evals/eval-harness.sh                    # default: fakoli-welder (SGLang)
+FAKOLI_EVAL_AGENT=fakoli-guido bash evals/eval-harness.sh   # score a specific agent
+bash evals/eval-harness.sh --compare          # local SGLang (welder) vs cloud GPT-5.5 (guido)
 ```
 
-Writes `eval-<ts>.json`, appends `eval-history.jsonl`, and updates `eval-latest.json` under
-`~/fakoli-runner/eval/` (the dashboard reads `eval-latest.json`). Baseline: `fakoli-welder` on
-`sglang/qwen3.6-35b-a3b-local` → **3/3** in ~53s.
+Writes `eval-<agent>-<ts>.json`, appends `eval-history.jsonl`, and updates `eval-latest.json` under
+`~/fakoli-runner/eval/` (the dashboard reads `eval-latest.json`). `--compare` runs the full suite on
+both tiers back to back so you can see the local/cloud quality gap on the same tasks.
 
-Extend by adding `run_task <id> "<prompt>" "<python-assert verify>"` lines; point
-`FAKOLI_EVAL_AGENT` at any agent to compare tiers.
+Extend by adding `run_task <id> "<prompt>" "<python-assert verify>"` lines inside `run_suite`.
+
+> Note: the per-task scratch module is named `<agent-with-underscores>_<id>.py` — agent ids contain
+> hyphens, which are illegal in Python module names, so the harness sanitizes `-` → `_` before import.
+
+## Integration (full-wave) eval
+
+`scripts/run-wave-clean.sh` runs a complete orchestrator wave end to end (2 SGLang specialists in
+parallel → critic gate → dependent integration → critic gate → sentinel) and scores the sentinel
+scorecard. Use it for the wave path; `eval-harness.sh` scores raw per-agent coding capability.
 
 ## `health-smoke.sh` — fast regression check
 
