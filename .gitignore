@@ -8,3 +8,5 @@ build/
 *.tsbuildinfo
 .openclaw/
 coverage/
+__pycache__/
+*.pyc
