@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>fakoli-claw — observability</title>
+<style>
+  :root{--bg:#0f1115;--card:#171a21;--line:#262b36;--txt:#e6e9ef;--mut:#9aa4b2;--cloud:#6ea8fe;--local:#5fd0a6;--ok:#5fd0a6;--bad:#ff6b6b;--warn:#ffd166;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;padding:24px}
+  h1{font-size:20px;font-weight:600;margin:0 0 2px}
+  .sub{color:var(--mut);font-size:12px;margin-bottom:18px}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin:0 0 10px;font-weight:600}
+  .big{font-size:30px;font-weight:700}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+  .b-ok{background:rgba(95,208,166,.15);color:var(--ok)} .b-bad{background:rgba(255,107,107,.15);color:var(--bad)}
+  .b-cloud{background:rgba(110,168,254,.15);color:var(--cloud)} .b-local{background:rgba(95,208,166,.15);color:var(--local)}
+  .b-warn{background:rgba(255,209,102,.15);color:var(--warn)}
+  table{width:100%;border-collapse:collapse} td{padding:5px 0;border-bottom:1px solid var(--line);font-size:13px} tr:last-child td{border-bottom:0}
+  .mut{color:var(--mut)} .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .spark{display:flex;gap:3px;align-items:flex-end;height:34px;margin-top:8px}
+  .spark span{flex:1;background:var(--cloud);border-radius:2px 2px 0 0;min-height:3px}
+</style>
+</head>
+<body>
+  <h1>fakoli-claw — local-first crew observability</h1>
+  <div class="sub" id="gen">loading…</div>
+  <div class="grid" id="grid"></div>
+<script src="./metrics.js" onerror="void 0"></script>
+<script>
+const SAMPLE={generated:"(sample — run scripts/collect-metrics.sh)",gateway:{state:"active"},config_valid:true,state_mcp:true,
+ sglang:{reachable:true,url:"http://100.87.34.66:30000",running_req:0,concurrency_budget:3,model:"qwen3.6-35b-a3b-local"},
+ gpu:{name:"RTX 5090",vram_total_mb:32607,vram_used_mb:null,util_pct:null},gaming_on:false,
+ agents:[{id:"fakoli-orchestrator",model:"openai/gpt-5.5",tier:"cloud"},{id:"fakoli-guido",model:"openai/gpt-5.5",tier:"cloud"},{id:"fakoli-critic",model:"openai/gpt-5.5",tier:"cloud"},{id:"fakoli-sentinel",model:"openai/gpt-5.5",tier:"cloud"},{id:"fakoli-welder",model:"sglang/qwen3.6-35b-a3b-local",tier:"local"},{id:"fakoli-smith",model:"sglang/qwen3.6-35b-a3b-local",tier:"local"},{id:"fakoli-scout",model:"sglang/qwen3.6-35b-a3b-local",tier:"local"},{id:"fakoli-herald",model:"sglang/qwen3.6-35b-a3b-local",tier:"local"},{id:"fakoli-keeper",model:"sglang/qwen3.6-35b-a3b-local",tier:"local"}],
+ eval:{score:1.0,passed:3,total:3,total_seconds:0}};
+const M = (window.FAKOLI_METRICS)||SAMPLE;
+const bool=(v,t,f)=>v?`<span class="badge b-ok">${t||"yes"}</span>`:`<span class="badge b-bad">${f||"no"}</span>`;
+document.getElementById("gen").textContent = "generated "+(M.generated||"?");
+const g=document.getElementById("grid");
+function card(title,body){const d=document.createElement("div");d.className="card";d.innerHTML=`<h2>${title}</h2>${body}`;g.appendChild(d);}
+
+card("Stack health",
+  `<div class="row"><span>Gateway</span>${bool((M.gateway||{}).state==="active",(M.gateway||{}).state||"?","down")}</div>`+
+  `<div class="row"><span>Config</span>${bool(M.config_valid,"valid","invalid")}</div>`+
+  `<div class="row"><span>State MCP</span>${bool(M.state_mcp,"loaded","off")}</div>`+
+  `<div class="row"><span>SGLang</span>${bool((M.sglang||{}).reachable,"up","down")}</div>`);
+
+const s=M.sglang||{};
+card("Local tier (SGLang)",
+  `<div class="big">${s.running_req==null?"–":s.running_req}<span class="mut" style="font-size:13px"> / ${s.concurrency_budget||3} running</span></div>`+
+  `<div class="row"><span>Model</span><span class="mono">${s.model||"?"}</span></div>`+
+  `<div class="row"><span>Gaming toggle</span>${M.gaming_on==null?'<span class="badge b-warn">n/a</span>':(M.gaming_on?'<span class="badge b-warn">ON (GPU busy)</span>':'<span class="badge b-ok">off (SGLang free)</span>')}</div>`+
+  `<div class="row mut mono" style="font-size:11px"><span>${s.url||""}</span><span></span></div>`);
+
+const gp=M.gpu||null;
+card("GPU / VRAM", gp?(
+  `<div class="row"><span>${gp.name||"GPU"}</span><span>${gp.util_pct==null?"–":gp.util_pct+"%"} util</span></div>`+
+  `<div class="row"><span>VRAM</span><span>${gp.vram_used_mb==null?"–":gp.vram_used_mb}/${gp.vram_total_mb||"?"} MB</span></div>`
+):`<div class="mut">n/a — collect on the GPU host (nvidia-smi via FAKOLI_GPU_JSON)</div>`);
+
+const ev=M.eval||null;
+let evb;
+if(ev){const sc=(ev.score!=null?ev.score:(ev.passed/ev.total));evb=`<div class="big">${(sc*100).toFixed(0)}%<span class="mut" style="font-size:13px"> (${ev.passed}/${ev.total})</span></div>`+
+  `<div class="mut">latest coding eval${ev.total_seconds?` · ${ev.total_seconds}s`:""}</div>`;}
+else evb=`<div class="mut">no eval yet — run scripts/eval-harness.sh</div>`;
+card("Eval score", evb);
+
+const ags=M.agents||[];
+let rows=ags.map(a=>`<tr><td>${a.id.replace("fakoli-","")}</td><td><span class="badge b-${a.tier}">${a.tier}</span></td><td class="mut mono">${(a.model||"").split("/").pop()}</td></tr>`).join("");
+card("Crew ("+ags.length+" agents)", `<table>${rows}</table>`);
+</script>
+</body>
+</html>
