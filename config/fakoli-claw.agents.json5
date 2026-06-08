@@ -11,11 +11,23 @@
 // prompt, shipped under agents/<id>/AGENTS.md in this repo).
 //
 // Tools: the crew needs the "coding" tool surface (read/write/edit/exec/glob/grep).
-// Set `tools.profile: "coding"` globally OR add per-agent allowlists to taste —
-// omitted here so this snippet doesn't override your main agent's tool profile.
+// Set `tools.profile: "coding"` globally OR add per-agent allowlists to taste.
 {
   agents: {
     defaults: {
+      // --- Compaction (REQUIRED for small-context local models) -----------------
+      // OpenClaw's default reserveTokens floor is 20000. On a ~32K-context local
+      // model that leaves only ~12K usable, so the agent's own system prompt +
+      // tool schemas trip threshold compaction on turn 1 and the openai-completions
+      // "CLI transcript compaction" dead-locks ("Already compacted"). 8192 + floor 0
+      // gives the 32K model ~24.5K usable and is harmless for big cloud windows
+      // (threshold = contextWindow - reserveTokens auto-scales per model).
+      // See docs/NOTES-compaction.md and the upstream bug issue.
+      compaction: {
+        reserveTokens: 8192,
+        reserveTokensFloor: 0,
+      },
+
       subagents: { maxSpawnDepth: 2, maxConcurrent: 5, maxChildrenPerAgent: 8, runTimeoutSeconds: 1200 },
     },
     list: [
