@@ -37,14 +37,12 @@ export default definePluginEntry({
     api.registerCommand({
       name: "crew",
       description: "Show the Fakoli specialist crew and how the orchestrator runs waves.",
-      acceptsArgs: false,
-      handler: async () => CREW_MENU,
+      handler: async () => ({ text: CREW_MENU }),
     });
     api.registerCommand({
       name: "flow",
       description: "Show the fakoli-flow pipeline (brainstorm -> plan -> execute -> verify -> finish, + quick).",
-      acceptsArgs: true,
-      handler: async () => FLOW_MENU,
+      handler: async () => ({ text: FLOW_MENU }),
     });
   },
 });
