@@ -61,6 +61,13 @@ Four invariants: **intent over recipe**, **specialist over generalist**, **evide
 
 Crew + wave engine + flow + state + style are live and validated on SGLang (Qwen3.6-35B-A3B) + GPT-5.5. See [CHANGELOG.md](CHANGELOG.md) and `docs/`.
 
+## Documentation
+
+Architecture, internals, the build story, and the framework comparison live in
+[`docs/`](docs/README.md) — start with [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), then
+[`docs/THE-BUILD.md`](docs/THE-BUILD.md) and [`docs/COMPARISON.md`](docs/COMPARISON.md). Operating
+OpenClaw safely with an autonomous crew: [`docs/HARDENING.md`](docs/HARDENING.md).
+
 ## Background & further reading
 
 fakoli-claw is the OpenClaw implementation of the **Fakoli Style** operating model. The "why" behind
