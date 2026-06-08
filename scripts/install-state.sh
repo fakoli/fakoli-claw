@@ -32,7 +32,7 @@ fi
 # Register fakoli-state under .mcp.servers (OpenClaw schema: mcp.servers.<id>, NOT top-level mcpServers).
 TMP="$(mktemp)"
 jq --arg bin "$STATE_BIN" '
-  .mcp.servers."fakoli-state" = {type:"stdio", command:"bash", args:[$bin]}
+  .mcp.servers."fakoli-state" = {command:"bash", args:[$bin]}
 ' "$CFG" > "$TMP" && python3 -c "import json;json.load(open('$TMP'))" \
   && cp "$CFG" "$CFG.bak-state-$(date +%Y%m%d-%H%M%S)" && mv "$TMP" "$CFG" \
   && echo "registered mcp.servers.fakoli-state -> bash $STATE_BIN"

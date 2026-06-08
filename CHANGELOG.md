@@ -1,0 +1,44 @@
+# Changelog
+
+All notable changes to fakoli-claw are documented here. Format loosely follows
+[Keep a Changelog](https://keepachangelog.com/); versions follow semver.
+
+## [0.1.0] — 2026-06-08
+
+First end-to-end working release: the crew, the wave engine, the flow pipeline, durable state,
+and style — all live and validated on SGLang (Qwen3.6-35B-A3B) + GPT-5.5.
+
+### Added
+- **Wave engine (Phase B).** `fakoli-orchestrator` drives dependency-ordered waves via
+  `sessions_spawn` + `sessions_yield`, with a `fakoli-critic` gate after every code wave and a
+  `fakoli-sentinel` evidence scorecard. Validated: 2 specialists on SGLang in parallel, critic
+  PASS (re-runs verify) and BLOCK, sentinel `Final verdict: PASS`.
+- **Orchestrator subagents config.** `subagents.allowAgents` (the 8 specialists) +
+  `delegationMode: prefer`; limits (`maxSpawnDepth`, `maxConcurrent`, …) in
+  `agents.defaults.subagents`. (Per-agent `subagents` accepts only `allowAgents` + `delegationMode`.)
+- **Flow pipeline (Phase C).** Six OpenClaw skills — `flow-brainstorm/plan/execute/verify/finish/quick`
+  — ported from fakoli-flow (`Agent(subagent_type=…)` → `sessions_spawn`). Plus `hooks/detect-context.sh`.
+- **State MCP (Phase D).** `fakoli-state` FastMCP server registered under `mcp.servers.fakoli-state`;
+  22 durable-state tools (PRD/plan/claim/review lifecycle) live on the crew. `install-state.sh` adds
+  `uv` and warms the venv. Live round-trip verified from a SGLang-tier agent.
+- **Style (Phase E).** `style-ops` skill + principles ledger (`data/principles.json`).
+- **Plugin shell (Phase F).** `index.ts` registers `/crew` and `/flow` menu commands + a SessionStart
+  context hook.
+- **One-command install.** `scripts/install.sh` with preflight checks (SGLang reachable, gateway up,
+  models present, uv) + auto config-validate + gateway restart.
+- **Docs.** README quickstart, `docs/BRING-YOUR-OWN-MODEL.md`, compaction notes.
+
+### Fixed
+- **Compaction dead-lock on small-context local models** — `reserveTokens=8192`,
+  `reserveTokensFloor=0` (global). Without it, a ~32K-context agent dead-locks on turn-1 compaction.
+  Upstream report: issue #1.
+
+### Known limitations
+- `reserveTokensFloor` is global-only (no per-agent / percentage). Upstreaming proposed.
+- `/crew` `/flow` slash commands require the plugin to be loaded (`openclaw plugins install .`); the
+  flow **skills** work without it.
+- The `fakoli-state` server currently runs from the `fakoli-plugins` checkout; vendoring it into the
+  plugin is a packaging follow-up.
+
+## [0.0.1]
+- Initial scaffold: plugin manifest, entry skeleton, port plan, Phase A crew agents.

@@ -22,6 +22,19 @@ SPECIALISTS='["fakoli-guido","fakoli-critic","fakoli-scout","fakoli-smith","fako
 
 command -v openclaw >/dev/null || { echo "FATAL: openclaw not on PATH"; exit 1; }
 command -v jq >/dev/null       || { echo "FATAL: jq required"; exit 1; }
+command -v python3 >/dev/null  || { echo "FATAL: python3 required"; exit 1; }
+
+echo "== Preflight =="
+SGLANG_URL="${FAKOLI_SGLANG_URL:-http://100.87.34.66:30000}"
+if curl -fsS --max-time 5 "$SGLANG_URL/v1/models" >/dev/null 2>&1 || curl -fsS --max-time 5 "$SGLANG_URL/health" >/dev/null 2>&1; then
+  echo "  [ok] SGLang reachable ($SGLANG_URL)"
+else
+  echo "  [warn] SGLang NOT reachable ($SGLANG_URL) — local tier offline; turn it ON or set FAKOLI_SGLANG_URL"
+fi
+openclaw gateway status >/dev/null 2>&1 && echo "  [ok] gateway reachable" || echo "  [warn] gateway not reachable (will start/restart at the end)"
+grep -q 'sglang/qwen3.6-35b-a3b-local' "$CFG" 2>/dev/null && echo "  [ok] local model in config" || echo "  [warn] local model not yet in config"
+grep -q 'openai/gpt-5.5' "$CFG" 2>/dev/null && echo "  [ok] cloud model in config" || echo "  [warn] cloud model not yet in config"
+command -v uv >/dev/null 2>&1 && echo "  [ok] uv present" || echo "  [warn] uv missing (needed for the fakoli-state MCP; install-state.sh will add it)"
 
 install_agent() {
   local id="$1" model="$2" ws="$STATE/workspace-$1"
