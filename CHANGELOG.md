@@ -3,6 +3,25 @@
 All notable changes to fakoli-claw are documented here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow semver.
 
+## [Unreleased]
+
+### Added — the complete onboarding story (zero → wave)
+- **`scripts/sglang-serve.sh`** — configurable SGLang Docker runner. Actions `up`/`down`/`restart`/
+  `status`/`logs`/`print`; flags for model, port, context, max-running, mem-fraction, tensor-parallel,
+  quantization, kv-cache dtype, served-name, image, shm, HF token, and `--extra` passthrough (env
+  overrides via `FAKOLI_*`). `up` waits for the endpoint to answer; `down` frees the GPU for gaming.
+  Defaults match the proven single-32GB-card config.
+- **`scripts/openclaw-bootstrap.sh`** — general-audience helper that applies the fixes any
+  small-context local model needs on OpenClaw (fakoli or not): the compaction fix
+  (`reserveTokens=8192`, `reserveTokensFloor=0`), sane sub-agent caps, and optional provider
+  registration for your OpenAI-compatible endpoint. Idempotent; backs up + validates config (restores
+  on invalid); `--dry-run` previews; no gateway restart unless `--restart`.
+- **`setup.sh`** — one-command orchestrator sequencing serve → bootstrap → install → state → smoke,
+  with `--serve`, `--provider-url`, `--model`, `--served-name`, `--no-state`.
+- **`docs/GETTING-STARTED.md`** — the four-move product walkthrough (serve a model, fix OpenClaw,
+  install the crew, run a wave), including the no-GPU path and the gaming toggle. README install
+  section reworked to front it.
+
 ## [0.1.0] — 2026-06-08
 
 First end-to-end working release: the crew, the wave engine, the flow pipeline, durable state,

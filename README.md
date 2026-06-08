@@ -22,25 +22,41 @@
 
 Override per install with `FAKOLI_CLOUD_MODEL` / `FAKOLI_LOCAL_MODEL`. See [docs/BRING-YOUR-OWN-MODEL.md](docs/BRING-YOUR-OWN-MODEL.md).
 
-## Install (one command)
+## Install
+
+Four moves: **serve a model, fix OpenClaw for it, install the crew, run a wave.** One command does all of it — see **[docs/GETTING-STARTED.md](docs/GETTING-STARTED.md)** for the full walkthrough.
 
 ```bash
 git clone https://github.com/fakoli/fakoli-claw && cd fakoli-claw
-bash scripts/install.sh           # crew agents + subagents + compaction + flow/style skills
-bash scripts/install-state.sh     # optional: fakoli-state MCP (installs uv, registers the server)
+
+# Have a local GPU? Serve a model, fix OpenClaw, install the crew, smoke-test it:
+bash setup.sh --serve --model unsloth/Qwen3.6-35B-A3B-NVFP4
+
+# No GPU? Point at any OpenAI-compatible endpoint you already run:
+bash setup.sh --provider-url http://localhost:30000/v1 --served-name my-local-model
 ```
 
-`install.sh` runs preflight checks (SGLang reachable? gateway up? models present? uv?), registers the crew tier-routed, wires the orchestrator's `subagents.allowAgents`, applies the **compaction fix** required for small-context local models, installs the flow + style skills into the `main` and `fakoli-orchestrator` workspaces, then restarts the gateway.
+Or run the steps yourself:
+
+```bash
+bash scripts/sglang-serve.sh up         # 1. serve a model in Docker (configurable; `down` frees the GPU for gaming)
+bash scripts/openclaw-bootstrap.sh      # 2. fix OpenClaw for small local models (compaction + sub-agent caps)
+bash scripts/install.sh                 # 3. install the 9-agent crew + flow/style skills, restart gateway
+bash scripts/install-state.sh           # 4. optional: durable fakoli-state MCP (installs uv)
+```
+
+`sglang-serve.sh` runs SGLang with any model/limits (`--model/--ctx/--max-running/--mem-fraction/--tp/...`; `print` to dry-run, `down` to free the GPU). `openclaw-bootstrap.sh` is a **general-audience helper** — the compaction fix + sub-agent caps any small-context local model needs on OpenClaw, fakoli or not (`--dry-run` to preview; backs up + validates config). `install.sh` runs preflight checks, registers the crew tier-routed, wires the orchestrator's `subagents.allowAgents`, installs the flow + style skills, then restarts the gateway.
 
 ## Quickstart — run a wave
 
 ```bash
-# 1. SGLang must be ON (local tier). On the GPU host: docker ps --filter name=sglang
-# 2. Write an intent-driven plan (see flow-plan), then:
-openclaw agent --agent fakoli-orchestrator -m "Execute the plan at /path/plan.md using your wave-engine protocol: parallel sessions_spawn per wave, sessions_yield, a fakoli-critic gate after each code wave, then a fakoli-sentinel evidence scorecard. End with WAVE-OK or WAVE-BLOCKED."
+# 1. Local tier up? On the GPU host: bash scripts/sglang-serve.sh status
+# 2. Write an intent-driven plan (see flow-plan), then hand it to the orchestrator with a fresh session key:
+openclaw agent --agent fakoli-orchestrator --session-key agent:fakoli-orchestrator:run1 \
+  -m "Execute the plan at /abs/path/plan.md using your wave-engine protocol: parallel sessions_spawn per wave, sessions_yield, a fakoli-critic gate after each code wave, then a fakoli-sentinel evidence scorecard. End with WAVE-OK or WAVE-BLOCKED."
 ```
 
-The orchestrator spawns specialists (local on SGLang), gates with the critic, and the sentinel writes an evidence scorecard. Verify the crew + skills:
+The call returns after the first dispatch — the wave runs asynchronously. The orchestrator spawns specialists (local on SGLang), gates with the critic, and the sentinel writes an evidence scorecard; poll the run's scratch dir for `sentinel-final.status`. Verify the crew + skills:
 
 ```bash
 openclaw agents list
