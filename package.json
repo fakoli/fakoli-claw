@@ -1,0 +1,26 @@
+{
+  "name": "fakoli-claw",
+  "version": "0.0.1",
+  "description": "The Fakoli plugin suite (specialist crew + wave orchestration) ported to the OpenClaw multi-agent runtime. Local-first, tier-routed.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Sekou Doumbouya (https://github.com/fakoli)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fakoli/fakoli-claw"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "agents",
+    "multi-agent",
+    "orchestration",
+    "fakoli",
+    "crew",
+    "local-llm",
+    "sglang"
+  ],
+  "openclaw": {
+    "extensions": ["./index.ts"]
+  }
+}

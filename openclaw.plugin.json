@@ -1,0 +1,10 @@
+{
+  "id": "fakoli-claw",
+  "name": "fakoli-claw",
+  "version": "0.0.1",
+  "description": "The Fakoli suite on OpenClaw: specialist crew + wave orchestration, local-first and tier-routed.",
+  "author": "Sekou Doumbouya",
+  "homepage": "https://github.com/fakoli/fakoli-claw",
+  "license": "MIT",
+  "keywords": ["agents", "multi-agent", "orchestration", "fakoli", "crew"]
+}
