@@ -24,7 +24,7 @@ run_suite() {
     local f="$OUT/${SAFE}_${id}.py"; rm -f "$f"
     local t0 t1 dur ok
     t0=$(date +%s)
-    openclaw agent --agent "$AGENT" --timeout 300 -m "Create the file $f containing Python. $prompt Write only that file; put no prose in the file." >/dev/null 2>&1
+    openclaw agent --agent "$AGENT" --session-key "agent:$AGENT:eval-$TS-$id" --timeout 300 -m "Create the file $f containing Python. $prompt Write only that file; put no prose in the file." >/dev/null 2>&1
     t1=$(date +%s); dur=$((t1-t0)); TLAT=$((TLAT+dur))
     if [ -f "$f" ] && python3 -c "$verify" >/dev/null 2>&1; then ok=1; PASS=$((PASS+1)); echo "  PASS $id (${dur}s)"; else ok=0; echo "  FAIL $id (${dur}s)"; fi
     DETAIL="$DETAIL{\"id\":\"$id\",\"pass\":$ok,\"seconds\":$dur},"
