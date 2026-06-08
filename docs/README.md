@@ -12,6 +12,8 @@ Start with the architecture, then the build story, then go as deep as you need.
   tradeoffs not a leaderboard.
 - **[BACKGROUND.md](BACKGROUND.md)** — how each component maps to the writing it came from (the
   Fakoli Style operating model).
+- **[ROUTING.md](ROUTING.md)** — when to stay native, when to use the flow skills, and when not to
+  use the crew.
 
 ## Internals (the multi-detail layer)
 

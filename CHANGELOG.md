@@ -5,6 +5,11 @@ All notable changes to fakoli-claw are documented here. Format loosely follows
 
 ## [Unreleased]
 
+### Added — routing guidance for assistants
+- **`docs/ROUTING.md`** — documents when to stay native, when to use each `flow-*` skill, when direct
+  specialist dispatch is appropriate, and when not to use fakoli-claw. README + docs index now link
+  to it.
+
 ### Added — the complete onboarding story (zero → wave)
 - **`scripts/sglang-serve.sh`** — configurable SGLang Docker runner. Actions `up`/`down`/`restart`/
   `status`/`logs`/`print`; flags for model, port, context, max-running, mem-fraction, tensor-parallel,
