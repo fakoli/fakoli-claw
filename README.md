@@ -81,8 +81,9 @@ Crew + wave engine + flow + state + style are live and validated on SGLang (Qwen
 
 Architecture, internals, the build story, and the framework comparison live in
 [`docs/`](docs/README.md) — start with [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), then
-[`docs/THE-BUILD.md`](docs/THE-BUILD.md) and [`docs/COMPARISON.md`](docs/COMPARISON.md). Operating
-OpenClaw safely with an autonomous crew: [`docs/HARDENING.md`](docs/HARDENING.md).
+[`docs/THE-BUILD.md`](docs/THE-BUILD.md) and [`docs/COMPARISON.md`](docs/COMPARISON.md). Deciding
+when to use the crew versus native tools: [`docs/ROUTING.md`](docs/ROUTING.md). Operating OpenClaw
+safely with an autonomous crew: [`docs/HARDENING.md`](docs/HARDENING.md).
 
 ## Background & further reading
 
