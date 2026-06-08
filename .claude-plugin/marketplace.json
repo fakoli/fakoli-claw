@@ -1,0 +1,38 @@
+{
+  "name": "fakoli-claw",
+  "displayName": "fakoli-claw",
+  "owner": {
+    "name": "Sekou Doumbouya",
+    "github": "fakoli"
+  },
+  "metadata": {
+    "description": "The Fakoli suite on OpenClaw — a local-first, tier-routed multi-agent coding crew with wave orchestration and durable state.",
+    "version": "0.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fakoli/fakoli-claw"
+  },
+  "categories": [
+    {
+      "id": "agents",
+      "name": "Agents",
+      "description": "Multi-agent orchestration and specialist crews"
+    },
+    {
+      "id": "local-llm",
+      "name": "Local LLM",
+      "description": "Run high-volume agent work on your own GPU via an OpenAI-compatible endpoint"
+    }
+  ],
+  "plugins": [
+    {
+      "name": "fakoli-claw",
+      "version": "0.1.0",
+      "description": "Specialist crew (9 agents) + wave engine (sessions_spawn + critic gate + sentinel) + fakoli-flow pipeline skills + the fakoli-state MCP (durable PRD/plan/claim state). Specialists run local on SGLang/vLLM/Ollama; planner/critic route to a frontier model. Pure-config tier routing.",
+      "source": ".",
+      "category": "agents",
+      "keywords": ["agents", "multi-agent", "orchestration", "fakoli", "crew", "local-llm", "sglang"]
+    }
+  ]
+}

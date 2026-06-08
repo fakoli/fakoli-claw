@@ -61,6 +61,21 @@ Four invariants: **intent over recipe**, **specialist over generalist**, **evide
 
 Crew + wave engine + flow + state + style are live and validated on SGLang (Qwen3.6-35B-A3B) + GPT-5.5. See [CHANGELOG.md](CHANGELOG.md) and `docs/`.
 
+## Background & further reading
+
+fakoli-claw is the OpenClaw implementation of the **Fakoli Style** operating model. The "why" behind
+every design choice here is in the writing — start with
+**[The Fakoli Style: An Operating Model for Building With Agents](https://sekoudoumbouya.com/blog/the-fakoli-style)**,
+then [Intent-Driven Flow](https://sekoudoumbouya.com/blog/intent-driven-agentic-flow),
+[crew archetypes](https://sekoudoumbouya.com/blog/fakoli-crew-agent-archetypes), and
+[State Is the Product](https://sekoudoumbouya.com/blog/state-is-the-product). Full map of components →
+essays: [`docs/BACKGROUND.md`](docs/BACKGROUND.md). More: [sekoudoumbouya.com/writing](https://sekoudoumbouya.com/writing).
+
+## Evals & health
+
+`evals/eval-harness.sh` scores the crew on deterministic coding tasks (a repeatable per-model number);
+`evals/health-smoke.sh` is a one-shot live-stack check. See [`evals/README.md`](evals/README.md).
+
 ## Credits
 
 By [Sekou Doumbouya](https://github.com/fakoli). Canonical agent prompts: [fakoli-plugins](https://github.com/fakoli/fakoli-plugins). MIT licensed.

@@ -21,8 +21,15 @@ RUNNING_REQ="$(curl -fsS --max-time 5 "$SGLANG_URL/metrics" 2>/dev/null | grep -
 # Agents (id + model + tier) from config.
 AGENTS_JSON="$(jq -c '[.agents.list[] | select(.id|startswith("fakoli-")) | {id, model, tier: (if (.model|test("sglang")) then "local" else "cloud" end)}]' "$CFG" 2>/dev/null || echo '[]')"
 EVAL_JSON="$(cat "$HOME/fakoli-runner/eval/eval-latest.json" 2>/dev/null || echo 'null')"
+# GPU + gaming state come from fakoli-dark via push-host-metrics.sh (the host pushes them here,
+# since the Mac can't pull from the GPU host without an elevated SSH key). Falls back to env/null.
+HOST_METRICS="$HOME/fakoli-runner/host-metrics.json"
 GPU_JSON="${FAKOLI_GPU_JSON:-null}"
 GAMING_ON="${FAKOLI_GAMING_ON:-null}"
+if [ -f "$HOST_METRICS" ]; then
+  GPU_JSON="$(jq -c '.gpu' "$HOST_METRICS" 2>/dev/null || echo null)"
+  GAMING_ON="$(jq -r '.gaming_on' "$HOST_METRICS" 2>/dev/null || echo null)"
+fi
 
 cat > "$OUT" <<JS
 window.FAKOLI_METRICS = {

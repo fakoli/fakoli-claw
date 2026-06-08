@@ -35,10 +35,13 @@ and style — all live and validated on SGLang (Qwen3.6-35B-A3B) + GPT-5.5.
 
 ### Known limitations
 - `reserveTokensFloor` is global-only (no per-agent / percentage). Upstreaming proposed.
-- `/crew` `/flow` slash commands require the plugin to be loaded (`openclaw plugins install .`); the
-  flow **skills** work without it.
-- The `fakoli-state` server currently runs from the `fakoli-plugins` checkout; vendoring it into the
-  plugin is a packaging follow-up.
+- `/crew` `/flow` slash commands: the plugin now **builds, installs, and loads** (compiled
+  `dist/index.mjs` + `configSchema`), but `register()` throws `Cannot read properties of undefined
+  (reading 'trim')` — an OpenClaw command-definition field contract not satisfied by
+  `{name, description, acceptsArgs, handler}` alone (single-object form confirmed against the bundled
+  `codex` plugin). Isolated to that one field; needs the plugin-author command reference. The flow
+  **skills** deliver the full pipeline meanwhile. Silence the load-time error with
+  `openclaw plugins disable fakoli-claw`.
 
 ## [0.0.1]
 - Initial scaffold: plugin manifest, entry skeleton, port plan, Phase A crew agents.
