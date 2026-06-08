@@ -1,0 +1,207 @@
+{
+  "version": "1.0.0",
+  "principles": [
+    {
+      "id": "P2",
+      "name": "Verifiable proof beats pattern-matching",
+      "principle": "Gates accept typed, verifiable evidence, never free-text that happens to contain the right substring.",
+      "why": "A substring gate is trivially satisfiable by writing the required string into any field, so it passes work that was never done.",
+      "status": "aspirational",
+      "credibility_risk": "high",
+      "open_work": "SL-3 (typed ProofArtifact evidence replacing the substring gate)"
+    },
+    {
+      "id": "P3",
+      "name": "Measure your own gates (false-pass rate)",
+      "principle": "A gate is only trusted once its false-pass rate is measured against injected faults and the baseline is committed.",
+      "why": "An unmeasured gate can wave through broken work indefinitely because nobody knows how often it lets failures pass.",
+      "status": "aspirational",
+      "credibility_risk": "high",
+      "open_work": "SL-2 (fault-injection harness + committed baseline)"
+    },
+    {
+      "id": "P4",
+      "name": "Prove invariants in CI, don't assert them",
+      "principle": "Critical invariants are checked by an executable test in CI, not asserted in prose or a comment.",
+      "why": "An invariant that is only asserted drifts silently the first time someone changes one of its two sides without anyone noticing.",
+      "status": "proven",
+      "credibility_risk": "high",
+      "open_work": "SL1-RR-1 RESOLVED (branch feat/fakoli-state-sl1-rr-1-event-sourcing): the latent poison-line gap is closed by the full event-sourced write path (decide/apply split, append(EventDraft)->Event|None, log-as-id-authority via flock, append-only events.jsonl + sibling audit.jsonl, strict no-skip replay). The post-COMMIT audit gap and PR #41 Critic-3 cross-process id-collision race are also closed. apply_event and PENDING_EVENT_ID are retired.",
+      "proof": "plugins/fakoli-state/tests/test_replay_equivalence.py::test_normal_and_replay_match_each_other_and_the_golden",
+      "embodied_in": [
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/tests/test_replay_equivalence.py",
+          "mechanism": "asserts serialize_state(normal apply path) == serialize_state(replay_from_empty) == committed golden snapshot"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": ".github/workflows/fakoli-state.yml",
+          "mechanism": "runs the replay-equivalence test on every PR touching the plugin"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/bin/src/fakoli_state/state/snapshot.py",
+          "mechanism": "serialize_state defines the canonical state compared for equivalence"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/tests/test_sqlite.py",
+          "mechanism": "TestAppendValidationFailure: poison-line impossibility — validation rejection writes zero events.jsonl lines and one audit.jsonl rejection line"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/tests/test_sqlite.py",
+          "mechanism": "TestCrossProcessConcurrency: two real subprocesses append concurrently via flock; verifies unique, contiguous ids with no collision (closes PR #41 Critic-3)"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/tests/test_sqlite.py",
+          "mechanism": "TestSelfHeal / TestForwardCatchUpConvergence: backend self-heals on open by replaying any events.jsonl lines not yet in the DB projection (forward-catch-up)"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/tests/test_sqlite.py",
+          "mechanism": "TestReplayStrict: replay_from_empty applies every line via _write_* only — no skip-list, no validation, structurally infallible for any well-formed log"
+        },
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/tests/test_sqlite.py",
+          "mechanism": "TestDecideApplyContract: per-action _check_* / _write_* contract — _check_* rejects illegal input with EventRejected and no side effects; _write_* succeeds whenever its matching _check_* passed"
+        }
+      ]
+    },
+    {
+      "id": "P7",
+      "name": "Coordinate through canonical state, not status files",
+      "principle": "Agents coordinate by reading and writing canonical Events, not by parsing each other's free-form status files.",
+      "why": "Status files have no schema and no ordering guarantees, so coordination built on them races and silently disagrees.",
+      "status": "aspirational",
+      "credibility_risk": "high",
+      "open_work": "SL-4 (promote status-file coordination to canonical Events)"
+    },
+    {
+      "id": "P9",
+      "name": "Score spec assumptions, not just tasks",
+      "principle": "Risk scoring ranks the spec's assumptions by blast radius and uncertainty, not just its enumerated tasks.",
+      "why": "Scoring only tasks leaves the most dangerous wrong assumptions unranked, so the plan optimizes effort while ignoring the real risk.",
+      "status": "aspirational",
+      "credibility_risk": "high",
+      "open_work": "SL-6 (score assumptions by blast_radius x uncertainty)"
+    },
+    {
+      "id": "P6",
+      "name": "Close the loop on failure, not just success",
+      "principle": "A failed wave is recorded as a first-class learnable event, the same way a successful one is.",
+      "why": "If only successes are captured, every failure is forgotten and the system relearns the same mistake on the next run.",
+      "status": "aspirational",
+      "credibility_risk": "med",
+      "open_work": "make a failed wave a first-class learnable event (substrate: events.jsonl)"
+    },
+    {
+      "id": "P8",
+      "name": "Conflicts live at the contract level, not the file level",
+      "principle": "Conflicts between agents are detected against declared output contracts and a post-apply drift check, not against raw file overlap.",
+      "why": "File-level conflict detection both misses semantic clashes in non-overlapping files and flags harmless coincidental edits as conflicts.",
+      "status": "aspirational",
+      "credibility_risk": "med",
+      "open_work": "SL-5 (OutputContract + post-apply drift check)"
+    },
+    {
+      "id": "P5",
+      "name": "Sequence by credibility risk, not demonstrability",
+      "principle": "Work is sequenced so the most load-bearing yet least-proven claims are addressed first, not the easiest ones to demo.",
+      "why": "Sequencing by demonstrability ships the impressive parts while the claims that would sink the project's credibility stay unproven.",
+      "status": "asserted",
+      "credibility_risk": "med",
+      "proof": "plugins/fakoli-state/docs/roadmap.md",
+      "embodied_in": [
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/docs/roadmap.md",
+          "mechanism": "integrity-first track orders SL-1..SL-6 by credibility risk ahead of demonstrability"
+        }
+      ],
+      "open_work": "encode the ordering as an automated check"
+    },
+    {
+      "id": "P1",
+      "name": "Advisory and enforcing share one code path",
+      "principle": "The advisory preview and the enforcing transition call the exact same gate predicate, never two parallel implementations.",
+      "why": "Two implementations of the same gate drift apart, so the preview a reviewer trusts stops matching the check that actually enforces.",
+      "status": "proven",
+      "credibility_risk": "med",
+      "proof": "plugins/fakoli-state/tests/test_transitions.py::TestEvidenceGateDelegation::test_transition_gate_agrees_with_review_gate",
+      "embodied_in": [
+        {
+          "plugin": "fakoli-state",
+          "ref": "plugins/fakoli-state/bin/src/fakoli_state/state/transitions.py",
+          "mechanism": "transitions._evidence_complete delegates to review.gates.evidence_complete (single source of truth)"
+        }
+      ],
+      "open_work": "extend the agreement-test pattern to fakoli-flow's preview/enforce paths"
+    },
+    {
+      "id": "P10",
+      "name": "Tool scratch lives outside version control",
+      "principle": "Run-local process artifacts are gitignored; only intent (specs and plans) is committed.",
+      "why": "Committing scratch clutters history and PR diffs with mechanics that have no value after the run.",
+      "status": "proven",
+      "proof": "tests/test-scratch-not-tracked.sh",
+      "embodied_in": [
+        {
+          "plugin": "repo",
+          "ref": ".gitignore",
+          "mechanism": "gitignores .fakoli/ so run scratch cannot be committed"
+        },
+        {
+          "plugin": "fakoli-flow",
+          "ref": "plugins/fakoli-flow/references/status-protocol.md",
+          "mechanism": "status files write to .fakoli/runs/<run-id>/, not docs/plans/"
+        }
+      ],
+      "open_work": "Status scratch is now proven untracked under both .fakoli/ and docs/plans/. Extend the check to non-status scratch (server PID/logs, screenshots) if those ever risk being committed.",
+      "credibility_risk": "med"
+    },
+    {
+      "id": "P11",
+      "name": "Derived indexes live outside the replay boundary",
+      "principle": "Data produced by a non-deterministic or external process (embeddings, vector indexes, search or semantic-graph caches not derivable from canonical rows) is a rebuildable projection kept outside canonical state — never in the event log or serialize_state.",
+      "why": "Canonical state must be a deterministic projection of the event log; admitting model-derived or externally-sourced data into it breaks replay equivalence the first time the model or source changes.",
+      "status": "aspirational",
+      "credibility_risk": "med",
+      "open_work": "Post-Wave-1: evaluate sqlite-vec (SQLite-native vector index) and a SQLite-native knowledge graph as derived projections that consult canonical state without entering it; see fakoli-state roadmap deferred section."
+    },
+    {
+      "id": "P12",
+      "name": "Untrusted external content is data, never instruction",
+      "principle": "Content from outside the trust boundary (web fetches, user- or third-party-authored PRD and spec text) is treated as data to be acted on, never as instructions the agent obeys, and crosses the boundary through an explicit inspection point.",
+      "why": "Without a boundary, a poisoned doc or fetched page can smuggle directions an agent follows, which silently turns Evidence over Claim into Claim over Evidence — the exact failure the operating model exists to prevent.",
+      "status": "aspirational",
+      "credibility_risk": "high",
+      "open_work": "Introduce a provenance/quarantine boundary: tag scout-fetched references and parsed PRD/spec text as external data so downstream agents treat them as content, not control, with an inspection step at the crossing. Candidate integrity-track roadmap item, sequenced after the SL-1..SL-6 evidence work."
+    },
+    {
+      "id": "P13",
+      "name": "Bounded refinement, explicit escalation",
+      "principle": "Every refinement or fix loop carries a hard iteration cap and a defined escalation path to a human; no loop relies on eventually converging on its own.",
+      "why": "An uncapped refine-and-recheck loop is the classic infinite-loop failure mode — it burns cost and hangs the run instead of surfacing a decision the human should make.",
+      "status": "asserted",
+      "credibility_risk": "med",
+      "proof": "plugins/fakoli-flow/skills/execute/SKILL.md",
+      "embodied_in": [
+        {
+          "plugin": "fakoli-flow",
+          "ref": "plugins/fakoli-flow/skills/execute/SKILL.md",
+          "mechanism": "critic fix cycle is capped at 3 iterations then escalates; welder/verify fix cycle capped at 2; a 5-minute poll timeout surfaces to the user; escalations are never silently swallowed"
+        },
+        {
+          "plugin": "fakoli-crew",
+          "ref": "plugins/fakoli-crew/skills/crew-ops/references/wave-patterns.md",
+          "mechanism": "critic-gate fix cycle bounded at max 3 cycles before the orchestrator must proceed or surface"
+        }
+      ],
+      "open_work": "Promote to proven with a harness that asserts a refinement loop terminates within its declared cap and emits an escalation event at the ceiling, rather than relying on the cap being honored by prompt instructions. Breadcrumb: the nearest real proof candidate is the git branch-collision ceiling (_MAX_COLLISION_ATTEMPTS=20) in plugins/fakoli-state/bin/src/fakoli_state/git_ops/branch.py — its termination half is already covered by test_git_ops.py::TestCreateBranchForTask::test_create_branch_handles_name_collision, but no test yet drives it to the ceiling to assert the 'too many branch collisions' escalation. Note that is a collision-avoidance loop escalating to its caller, so proving it would generalize P13 beyond refinement/fix loops; flow's prompt-driven critic/welder caps have no executable test today."
+    }
+  ]
+}
