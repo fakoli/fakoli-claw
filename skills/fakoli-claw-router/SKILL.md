@@ -1,6 +1,6 @@
 ---
 name: fakoli-claw-router
-description: Choose the right path for a coding request — native Codex for tiny edits vs a fakoli-claw flow for multi-file, risky, design, or explicit crew/Fakoli work.
+description: Choose how to handle a new coding request — native for tiny edits vs a fakoli-claw flow for multi-file, risky, design, or explicit crew/Fakoli work.
 ---
 
 # fakoli-claw-router
@@ -11,6 +11,14 @@ is chosen, that flow skill is canonical: defer to it.
 
 Full policy and rationale: `docs/ROUTING.md`.
 
+## Who routes
+
+Routing is the job of the **entry / coordinating agent** — usually `main` or `fakoli-orchestrator` —
+when it first picks up a request. If you are a **specialist already executing a scoped packet** (you
+were handed one task with scope, acceptance criteria, and a verify command), do **not** re-route:
+finish the packet and report evidence. If a request handed straight to a specialist genuinely needs a
+flow, hand it back to `main` / `fakoli-orchestrator` rather than running a flow yourself.
+
 ## Use this skill when
 
 - A coding request could be multi-file, risky, or a refactor.
@@ -20,6 +28,7 @@ Full policy and rationale: `docs/ROUTING.md`.
 
 ## Skip this skill when
 
+- You are a specialist mid-packet — complete the scoped task and report; don't re-route.
 - The change is a tiny, low-risk edit (1–2 files) you can make and verify directly.
 - It's pure Q&A, explanation, or summary with no implementation path.
 - It's an emergency fix where orchestration latency is the bigger risk.

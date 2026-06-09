@@ -76,8 +76,9 @@ bash scripts/install-state.sh    # durable state MCP (installs uv, registers the
 
 `install.sh` runs preflight checks (is SGLang reachable? gateway up? models present?), wires the
 orchestrator's sub-agent allowlist, and restarts the gateway. It also installs the flow, style, and
-**`fakoli-claw-router`** skills into the `main` and `fakoli-orchestrator` workspaces — the router
-decides when a request should stay native vs. enter a flow (see [ROUTING.md](ROUTING.md)). Edit the
+**`fakoli-claw-router`** skills into every agent workspace (`main`, the orchestrator, and the eight
+specialists) — the router decides when a request should stay native vs. enter a flow, and tells a
+specialist mid-packet to stand down rather than re-route (see [ROUTING.md](ROUTING.md)). Edit the
 tier split with `FAKOLI_CLOUD_MODEL` / `FAKOLI_LOCAL_MODEL` — see [BRING-YOUR-OWN-MODEL.md](BRING-YOUR-OWN-MODEL.md).
 
 ## Step 4 — run a wave

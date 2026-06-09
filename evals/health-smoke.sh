@@ -12,6 +12,7 @@ chk "9+ fakoli agents"                "[ \$(openclaw agents list 2>/dev/null | g
 chk "state MCP configured"            "jq -e '.mcp.servers.\"fakoli-state\"' \$HOME/.openclaw/openclaw.json"
 chk "flow-execute skill ready"        "openclaw skills list --agent fakoli-orchestrator 2>/dev/null | grep -q flow-execute"
 chk "router skill ready"              "openclaw skills list --agent fakoli-orchestrator 2>/dev/null | grep -q fakoli-claw-router"
+chk "router on a specialist"          "openclaw skills list --agent fakoli-welder 2>/dev/null | grep -q fakoli-claw-router"
 echo "  welder smoke (SGLang round-trip)..."
 if openclaw agent --agent fakoli-welder --session-key "agent:fakoli-welder:smoke-$(date +%s)" --timeout 180 -m 'Reply with exactly: SMOKE-OK' 2>/dev/null | grep -q 'SMOKE-OK'; then
   echo "  [ok]   welder responded SMOKE-OK"

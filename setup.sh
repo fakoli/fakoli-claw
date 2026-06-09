@@ -32,7 +32,7 @@ echo "-- step 2: bootstrap OpenClaw for local models --"
 BARGS=(); { [ -n "$PROVIDER_URL" ] && [ -n "${SERVED:-$MODEL}" ]; } && BARGS+=(--provider-url "$PROVIDER_URL" --model "${SERVED:-$MODEL}")
 bash "$HERE/scripts/openclaw-bootstrap.sh" "${BARGS[@]}"
 
-echo "-- step 3: install the crew (agents + flow/style/router skills) --"
+echo "-- step 3: install the crew (agents + flow/style skills + router on every agent) --"
 bash "$HERE/scripts/install.sh"
 
 if [ "$STATE" = 1 ]; then
