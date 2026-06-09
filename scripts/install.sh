@@ -79,6 +79,17 @@ for s in $FLOW_SKILLS; do
   fi
 done
 
+echo "== Router skill (every agent: main + orchestrator + specialists) =="
+# The router ships to every agent. main + fakoli-orchestrator route fresh requests; specialists carry
+# it too for consistency (and for when one is messaged directly), but its body tells a specialist
+# mid-packet to stand down rather than re-route. Reuses the canonical crew lists.
+if [ -d "$REPO_DIR/skills/fakoli-claw-router" ]; then
+  for id in main $CLOUD_AGENTS $LOCAL_AGENTS; do
+    openclaw skills install "$REPO_DIR/skills/fakoli-claw-router" --agent "$id" --as fakoli-claw-router --force >/dev/null 2>&1 \
+      && echo "  fakoli-claw-router -> $id" || echo "  WARN fakoli-claw-router -> $id failed"
+  done
+fi
+
 echo "== Style skill =="
 if [ -d "$REPO_DIR/skills/style-ops" ]; then
   openclaw skills install "$REPO_DIR/skills/style-ops" --agent main --as style-ops --force >/dev/null 2>&1 \

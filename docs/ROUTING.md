@@ -8,6 +8,11 @@ This guide is the routing policy for assistants that have both native coding
 tools and the fakoli-claw flow skills available. It keeps small work small, and
 it makes larger work use the operating model on purpose.
 
+> This policy also ships as an installable skill — `skills/fakoli-claw-router/` — installed to **every
+> agent workspace** (`main`, `fakoli-orchestrator`, and the eight specialists) by `scripts/install.sh`.
+> The skill is the operational, description-triggered form of this document; keep the two in sync.
+> Routing is the entry/coordinating agent's job — a specialist mid-packet defers instead of re-routing.
+
 ## The rule of thumb
 
 Use the lightest path that preserves the four invariants:

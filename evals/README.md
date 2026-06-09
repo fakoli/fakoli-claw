@@ -41,6 +41,24 @@ agents, state MCP configured, the flow-execute skill ready, and a welder SGLang 
 bash evals/health-smoke.sh
 ```
 
+## `routing-eval.sh` — prove the router routes, not just installs
+
+Validates the `fakoli-claw-router` skill (issue #3). Two parts: a **static lint** (deterministic, no
+gateway) checking that `SKILL.md` has `name` + a one-line `description` ≤160 chars and that every
+`flow:*` route it names maps to a real `skills/flow-*` directory; and **decision cases** that prompt a
+router-equipped agent with sample requests (typo → `native`, undecided new feature → `flow:brainstorm`,
+small under-3-file change → `flow:quick`, approved plan → `flow:execute`, "ready to ship?" →
+`flow:verify`) and check the chosen route token.
+
+```bash
+bash evals/routing-eval.sh                 # static lint + decision cases (agent: main)
+bash evals/routing-eval.sh --lint-only     # static checks only (CI-friendly, no LLM calls)
+FAKOLI_ROUTING_AGENT=fakoli-orchestrator bash evals/routing-eval.sh
+```
+
+Decision cases auto-skip when the gateway is unreachable or the agent lacks the router skill, so
+`--lint-only` is always safe in CI.
+
 ## Why these live in fakoli-claw
 
 This is the repo focused on running the crew on OpenClaw, so the harness that grades it and the smoke
