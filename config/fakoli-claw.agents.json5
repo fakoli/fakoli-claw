@@ -4,8 +4,8 @@
 // per-agent workspaces, copies each AGENTS.md prompt, then patches config).
 //
 // Tier routing (re-tune freely):
-//   cloud / quality   -> openai/gpt-5.5                 : orchestrator, guido, critic, sentinel
-//   local GPU node    -> sglang/qwen3.6-35b-a3b-local   : welder, smith, scout, herald, keeper
+//   quality tier      -> openai/gpt-5.5       : orchestrator, guido, critic, sentinel
+//   efficient tier    -> openai/gpt-5.4-mini  : welder, smith, scout, herald, keeper
 //
 // Each agent's system prompt is its workspace AGENTS.md (the canonical crew
 // prompt, shipped under agents/<id>/AGENTS.md in this repo).
@@ -15,13 +15,9 @@
 {
   agents: {
     defaults: {
-      // --- Compaction (REQUIRED for small-context local models) -----------------
-      // OpenClaw's default reserveTokens floor is 20000. On a ~32K-context local
-      // model that leaves only ~12K usable, so the agent's own system prompt +
-      // tool schemas trip threshold compaction on turn 1 and the openai-completions
-      // "CLI transcript compaction" dead-locks ("Already compacted"). 8192 + floor 0
-      // gives the 32K model ~24.5K usable and is harmless for big cloud windows
-      // (threshold = contextWindow - reserveTokens auto-scales per model).
+      // --- Compaction -----------------------------------------------------------
+      // Keep the reserve explicit so the crew has predictable room for tool-heavy
+      // wave work. This is still harmless for large cloud context windows.
       // See docs/NOTES-compaction.md and the upstream bug issue.
       compaction: {
         reserveTokens: 8192,
@@ -52,12 +48,12 @@
       { id: "fakoli-critic",   name: "Critic (Reviewer)",    workspace: "~/.openclaw/workspace-fakoli-critic",   model: "openai/gpt-5.5" },
       { id: "fakoli-sentinel", name: "Sentinel (QA)",        workspace: "~/.openclaw/workspace-fakoli-sentinel", model: "openai/gpt-5.5" },
 
-      // ---- Specialists: local on the SGLang node (parallel workers) ----
-      { id: "fakoli-welder",   name: "Welder (Integration)", workspace: "~/.openclaw/workspace-fakoli-welder",   model: "sglang/qwen3.6-35b-a3b-local" },
-      { id: "fakoli-smith",    name: "Smith (Plugin Eng)",   workspace: "~/.openclaw/workspace-fakoli-smith",    model: "sglang/qwen3.6-35b-a3b-local" },
-      { id: "fakoli-scout",    name: "Scout (Researcher)",   workspace: "~/.openclaw/workspace-fakoli-scout",    model: "sglang/qwen3.6-35b-a3b-local" },
-      { id: "fakoli-herald",   name: "Herald (Docs)",        workspace: "~/.openclaw/workspace-fakoli-herald",   model: "sglang/qwen3.6-35b-a3b-local" },
-      { id: "fakoli-keeper",   name: "Keeper (Infra)",       workspace: "~/.openclaw/workspace-fakoli-keeper",   model: "sglang/qwen3.6-35b-a3b-local" },
+      // ---- Specialists: OpenAI efficient tier (parallel workers) ----
+      { id: "fakoli-welder",   name: "Welder (Integration)", workspace: "~/.openclaw/workspace-fakoli-welder",   model: "openai/gpt-5.4-mini" },
+      { id: "fakoli-smith",    name: "Smith (Plugin Eng)",   workspace: "~/.openclaw/workspace-fakoli-smith",    model: "openai/gpt-5.4-mini" },
+      { id: "fakoli-scout",    name: "Scout (Researcher)",   workspace: "~/.openclaw/workspace-fakoli-scout",    model: "openai/gpt-5.4-mini" },
+      { id: "fakoli-herald",   name: "Herald (Docs)",        workspace: "~/.openclaw/workspace-fakoli-herald",   model: "openai/gpt-5.4-mini" },
+      { id: "fakoli-keeper",   name: "Keeper (Infra)",       workspace: "~/.openclaw/workspace-fakoli-keeper",   model: "openai/gpt-5.4-mini" },
     ],
   },
 }

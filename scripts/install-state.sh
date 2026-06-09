@@ -44,5 +44,5 @@ else
 fi
 
 echo "Tier routing: state tools are model-agnostic; crew tiers stay config-routed"
-echo "  (welder/smith/scout/herald/keeper -> SGLang; guido/critic/sentinel/orchestrator -> GPT-5.5)."
+echo "  (welder/smith/scout/herald/keeper -> OpenAI mini tier; guido/critic/sentinel/orchestrator -> OpenAI quality tier)."
 echo "install-state done. Restart gateway to load the MCP: openclaw gateway restart"

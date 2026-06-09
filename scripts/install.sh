@@ -4,8 +4,8 @@
 # compaction fix -> flow skills -> state MCP (if present) -> restart -> verify.
 #
 # Tier routing (override with env):
-#   FAKOLI_CLOUD_MODEL (default openai/gpt-5.5)               -> orchestrator, guido, critic, sentinel
-#   FAKOLI_LOCAL_MODEL (default sglang/qwen3.6-35b-a3b-local) -> welder, smith, scout, herald, keeper
+#   FAKOLI_CLOUD_MODEL (default openai/gpt-5.5)      -> orchestrator, guido, critic, sentinel
+#   FAKOLI_LOCAL_MODEL (default openai/gpt-5.4-mini) -> welder, smith, scout, herald, keeper
 set -euo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
@@ -13,7 +13,7 @@ REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 STATE="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
 CFG="$STATE/openclaw.json"
 CLOUD_MODEL="${FAKOLI_CLOUD_MODEL:-openai/gpt-5.5}"
-LOCAL_MODEL="${FAKOLI_LOCAL_MODEL:-sglang/qwen3.6-35b-a3b-local}"
+LOCAL_MODEL="${FAKOLI_LOCAL_MODEL:-openai/gpt-5.4-mini}"
 
 CLOUD_AGENTS="fakoli-orchestrator fakoli-guido fakoli-critic fakoli-sentinel"
 LOCAL_AGENTS="fakoli-welder fakoli-smith fakoli-scout fakoli-herald fakoli-keeper"
@@ -25,15 +25,14 @@ command -v jq >/dev/null       || { echo "FATAL: jq required"; exit 1; }
 command -v python3 >/dev/null  || { echo "FATAL: python3 required"; exit 1; }
 
 echo "== Preflight =="
-SGLANG_URL="${FAKOLI_SGLANG_URL:-http://100.87.34.66:30000}"
-if curl -fsS --max-time 5 "$SGLANG_URL/v1/models" >/dev/null 2>&1 || curl -fsS --max-time 5 "$SGLANG_URL/health" >/dev/null 2>&1; then
-  echo "  [ok] SGLang reachable ($SGLANG_URL)"
+if openclaw models status 2>/dev/null | grep -q 'openai.*status=usable'; then
+  echo "  [ok] OpenAI auth usable"
 else
-  echo "  [warn] SGLang NOT reachable ($SGLANG_URL) — local tier offline; turn it ON or set FAKOLI_SGLANG_URL"
+  echo "  [warn] OpenAI auth not confirmed; run: openclaw auth login openai"
 fi
 openclaw gateway status >/dev/null 2>&1 && echo "  [ok] gateway reachable" || echo "  [warn] gateway not reachable (will start/restart at the end)"
-grep -q 'sglang/qwen3.6-35b-a3b-local' "$CFG" 2>/dev/null && echo "  [ok] local model in config" || echo "  [warn] local model not yet in config"
-grep -q 'openai/gpt-5.5' "$CFG" 2>/dev/null && echo "  [ok] cloud model in config" || echo "  [warn] cloud model not yet in config"
+grep -q "$LOCAL_MODEL" "$CFG" 2>/dev/null && echo "  [ok] specialist model in config ($LOCAL_MODEL)" || echo "  [warn] specialist model not yet in config ($LOCAL_MODEL)"
+grep -q "$CLOUD_MODEL" "$CFG" 2>/dev/null && echo "  [ok] quality model in config ($CLOUD_MODEL)" || echo "  [warn] quality model not yet in config ($CLOUD_MODEL)"
 command -v uv >/dev/null 2>&1 && echo "  [ok] uv present" || echo "  [warn] uv missing (needed for the fakoli-state MCP; install-state.sh will add it)"
 
 install_agent() {
@@ -42,6 +41,16 @@ install_agent() {
     echo "  SKIP $id (missing agents/$id/AGENTS.md)"; return
   fi
   openclaw agents add "$id" --non-interactive --workspace "$ws" --model "$model" --json >/dev/null 2>&1 || true
+  TMP="$(mktemp)"
+  jq --arg id "$id" --arg ws "$ws" --arg model "$model" '
+    .agents.list |= (
+      if any(.[]; .id == $id) then
+        map(if .id == $id then .workspace = $ws | .model = $model else . end)
+      else
+        . + [{id:$id, name:$id, workspace:$ws, model:$model}]
+      end
+    )
+  ' "$CFG" > "$TMP" && python3 -c "import json;json.load(open('$TMP'))" && mv "$TMP" "$CFG"
   cp "$REPO_DIR/agents/$id/AGENTS.md" "$ws/AGENTS.md"
   rm -f "$ws/BOOTSTRAP.md"
   if [ -d "$REPO_DIR/agents/_references" ]; then
@@ -54,6 +63,22 @@ install_agent() {
 echo "== Fakoli crew agents =="
 for id in $CLOUD_AGENTS; do install_agent "$id" "$CLOUD_MODEL"; done
 for id in $LOCAL_AGENTS; do install_agent "$id" "$LOCAL_MODEL"; done
+
+echo "== Model defaults =="
+TMP="$(mktemp)"
+jq --arg cloud "$CLOUD_MODEL" --arg local "$LOCAL_MODEL" '
+  if $local != "sglang/qwen3.6-35b-a3b-local" then
+    del(.agents.defaults.models["sglang/qwen3.6-35b-a3b-local"])
+  else
+    .
+  end
+  |
+  .agents.defaults.models[$cloud] = (.agents.defaults.models[$cloud] // {})
+  | .agents.defaults.models[$local] = (.agents.defaults.models[$local] // {})
+  | .agents.defaults.model.primary = $cloud
+  | .agents.defaults.model.fallbacks = [$local]
+' "$CFG" > "$TMP" && python3 -c "import json;json.load(open('$TMP'))" && mv "$TMP" "$CFG"
+echo "  primary=$CLOUD_MODEL fallback=$LOCAL_MODEL"
 
 echo "== Orchestrator subagents allowlist + defaults limits (Phase B) =="
 # Per-agent subagents schema accepts ONLY allowAgents + delegationMode; limit fields live in
