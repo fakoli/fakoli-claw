@@ -5,6 +5,11 @@ All notable changes to fakoli-claw are documented here. Format loosely follows
 
 ## [Unreleased]
 
+### Changed - cloud-first default + SGLang on-demand
+- Default routing is cloud-first: primary `openai/gpt-5.5` (OAuth/Pro, flat-rate), fallback `openai/gpt-5.4-mini`; crew specialists on the cloud mini worker tier (`scripts/install.sh` defaults `FAKOLI_CLOUD_MODEL`/`FAKOLI_LOCAL_MODEL`).
+- **SGLang is optional/on-demand, off by default** - no auto-start; `scripts/sglang-serve.sh up`/`down` (or the Windows toggle scripts) control it. `FAKOLI_LOCAL_MODEL=sglang/...` opts back into the local tier.
+- **`docs/CLOUD-FIRST.md`** (new): cloud-first operating model, SGLang on-demand + remote-start design, and cost-safety guardrails (ElevenLabs opt-in only, Whisper default STT, brave search, per-token LLMs kept out of default routing; all keys as file SecretRefs).
+
 ### Added — routing guidance for assistants
 - **`docs/ROUTING.md`** — documents when to stay native, when to use each `flow-*` skill, when direct
   specialist dispatch is appropriate, and when not to use fakoli-claw. README + docs index now link

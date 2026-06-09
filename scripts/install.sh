@@ -6,6 +6,7 @@
 # Tier routing (override with env):
 #   FAKOLI_CLOUD_MODEL (default openai/gpt-5.5)      -> orchestrator, guido, critic, sentinel
 #   FAKOLI_LOCAL_MODEL (default openai/gpt-5.4-mini) -> welder, smith, scout, herald, keeper
+#       NOTE: cheap WORKER tier, defaults to a CLOUD mini model. Set FAKOLI_LOCAL_MODEL=sglang/... only for the optional on-demand local tier.
 set -euo pipefail
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
