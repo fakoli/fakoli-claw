@@ -8,6 +8,10 @@ This guide is the routing policy for assistants that have both native coding
 tools and the fakoli-claw flow skills available. It keeps small work small, and
 it makes larger work use the operating model on purpose.
 
+> This policy also ships as an installable skill — `skills/fakoli-claw-router/` — installed to the
+> `main` and `fakoli-orchestrator` workspaces by `scripts/install.sh`. The skill is the operational,
+> description-triggered form of this document; keep the two in sync.
+
 ## The rule of thumb
 
 Use the lightest path that preserves the four invariants:

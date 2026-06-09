@@ -32,7 +32,7 @@ echo "-- step 2: bootstrap OpenClaw for local models --"
 BARGS=(); { [ -n "$PROVIDER_URL" ] && [ -n "${SERVED:-$MODEL}" ]; } && BARGS+=(--provider-url "$PROVIDER_URL" --model "${SERVED:-$MODEL}")
 bash "$HERE/scripts/openclaw-bootstrap.sh" "${BARGS[@]}"
 
-echo "-- step 3: install the crew --"
+echo "-- step 3: install the crew (agents + flow/style/router skills) --"
 bash "$HERE/scripts/install.sh"
 
 if [ "$STATE" = 1 ]; then
@@ -46,4 +46,4 @@ bash "$HERE/evals/health-smoke.sh" || true
 echo
 echo "Done. Run a wave:"
 echo "  openclaw agent --agent fakoli-orchestrator --session-key agent:fakoli-orchestrator:run1 -m \"Execute the plan at <abs-path> ...\""
-echo "Docs: docs/GETTING-STARTED.md · docs/ARCHITECTURE.md"
+echo "Docs: docs/GETTING-STARTED.md · docs/ROUTING.md · docs/ARCHITECTURE.md"

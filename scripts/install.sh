@@ -79,6 +79,14 @@ for s in $FLOW_SKILLS; do
   fi
 done
 
+echo "== Router skill =="
+if [ -d "$REPO_DIR/skills/fakoli-claw-router" ]; then
+  openclaw skills install "$REPO_DIR/skills/fakoli-claw-router" --agent main --as fakoli-claw-router --force >/dev/null 2>&1 \
+    && echo "  fakoli-claw-router -> main" || echo "  WARN fakoli-claw-router -> main failed"
+  openclaw skills install "$REPO_DIR/skills/fakoli-claw-router" --agent fakoli-orchestrator --as fakoli-claw-router --force >/dev/null 2>&1 \
+    && echo "  fakoli-claw-router -> fakoli-orchestrator" || echo "  WARN fakoli-claw-router -> fakoli-orchestrator failed"
+fi
+
 echo "== Style skill =="
 if [ -d "$REPO_DIR/skills/style-ops" ]; then
   openclaw skills install "$REPO_DIR/skills/style-ops" --agent main --as style-ops --force >/dev/null 2>&1 \

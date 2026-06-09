@@ -9,6 +9,12 @@ All notable changes to fakoli-claw are documented here. Format loosely follows
 - **`docs/ROUTING.md`** — documents when to stay native, when to use each `flow-*` skill, when direct
   specialist dispatch is appropriate, and when not to use fakoli-claw. README + docs index now link
   to it.
+- **`skills/fakoli-claw-router/`** — the routing policy as an installable skill (the operational,
+  description-triggered form of `docs/ROUTING.md`). `install.sh` installs it to `main` and
+  `fakoli-orchestrator` alongside the `flow-*` skills; it is a thin router over those flows, never a
+  parallel workflow. Description tuned (≤160 chars) to fire on multi-file/risky/design/crew work and
+  stay quiet on tiny edits. Adds `evals/routing-eval.sh` (static lint + routing decision cases).
+  Closes #3.
 
 ### Added — the complete onboarding story (zero → wave)
 - **`scripts/sglang-serve.sh`** — configurable SGLang Docker runner. Actions `up`/`down`/`restart`/
