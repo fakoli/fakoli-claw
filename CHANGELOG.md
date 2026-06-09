@@ -12,10 +12,10 @@ All notable changes to fakoli-claw are documented here. Format loosely follows
 - **`skills/fakoli-claw-router/`** — the routing policy as an installable skill (the operational,
   description-triggered form of `docs/ROUTING.md`). `install.sh` installs it to **every agent**
   (`main`, `fakoli-orchestrator`, and the eight specialists); it is a thin router over the `flow-*`
-  skills, never a parallel workflow. Description tuned (≤160 chars) to fire on
-  multi-file/risky/design/crew work and stay quiet on tiny edits, with a guardrail so a specialist
-  mid-packet stands down instead of re-routing. Adds `evals/routing-eval.sh` (static lint + routing
-  decision cases) and a `health-smoke.sh` router check. Closes #3.
+  skills, never a parallel workflow. Description (≤160 chars), framed as a "new coding request",
+  fires on multi-file/risky/design/crew work and stays quiet on tiny edits, with a guardrail so a
+  specialist mid-packet stands down instead of re-routing. Adds `evals/routing-eval.sh` (static lint
+  + routing decision cases) and `health-smoke.sh` router checks (incl. a specialist). Closes #3.
 
 ### Added — the complete onboarding story (zero → wave)
 - **`scripts/sglang-serve.sh`** — configurable SGLang Docker runner. Actions `up`/`down`/`restart`/

@@ -9,6 +9,7 @@
 - **The crew** — 9 agents installed as OpenClaw `agents.list[]`: `fakoli-orchestrator` + 8 specialists (guido architect, critic reviewer, scout researcher, smith plugin-eng, welder integration, herald docs, keeper infra, sentinel QA).
 - **The wave engine** — the orchestrator dispatches specialists in parallel **waves** via `sessions_spawn` + `sessions_yield`, runs a **critic gate** after every code wave (it re-runs the verify commands — evidence over claim), and finishes with a **sentinel** evidence scorecard.
 - **The flow pipeline** — six OpenClaw skills: `flow-brainstorm → flow-plan → flow-execute → flow-verify → flow-finish` (+ `flow-quick` fast path).
+- **The router** — `fakoli-claw-router`, a description-triggered skill installed on **every agent**: it decides when a request stays native vs. enters a `flow:*`, and tells a specialist mid-packet to stand down rather than re-route. See [docs/ROUTING.md](docs/ROUTING.md).
 - **Durable state** — the `fakoli-state` FastMCP server (22 tools) exposes the PRD → plan → review → claim → apply lifecycle as MCP tool calls, backed by SQLite.
 - **Style** — `style-ops` maintains the operating-model principles ledger.
 - **Plugin shell** — `index.ts` registers the `/crew` and `/flow` menu commands + a SessionStart context banner.
