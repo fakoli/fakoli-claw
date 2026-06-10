@@ -104,3 +104,9 @@ essays: [`docs/BACKGROUND.md`](docs/BACKGROUND.md). More: [sekoudoumbouya.com/wr
 ## Credits
 
 By [Sekou Doumbouya](https://github.com/fakoli). Canonical agent prompts: [fakoli-plugins](https://github.com/fakoli/fakoli-plugins). MIT licensed.
+
+## Cloud-first (default)
+
+fakoli-claw runs **cloud-first by default** — the flat-rate OpenAI Pro/OAuth path is primary; the
+local SGLang tier is optional and on-demand. See **[docs/CLOUD-FIRST.md](docs/CLOUD-FIRST.md)** for
+routing, SGLang on-demand (+ remote-start design), and cost-safety guardrails.
